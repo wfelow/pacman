@@ -175,9 +175,9 @@ geister = [
     {"position": geister_positionen['t'], "farbe": 't', "durchmesser": geist_durchmesser, "timer": 0},
 ]
 geist_timer = 0  # Timer für Geisterbewegung
-geist_timer_intervall = 9  #Intervall für Richtungsänderung der Geister (z. B. alle 9 Frames/s) umso höher desto langsamer
+geist_timer_intervall = 12  #Intervall für Richtungsänderung der Geister (z. B. alle 9 Frames/s) umso höher desto langsamer
 
-# Funktion, um einen Geist zu zeichnen
+# Funktion, um die Geisterbilder einzufügen
 def draw_ghost(screen, geist):
     # Bild des Geistes auf die Position zeichnen
     screen.blit(geist_bilder[geist["farbe"]], (geist["position"][0] - geist_durchmesser // 2, geist["position"][1] - geist_durchmesser // 2)) #durch 2 für die Mitte des Blocks
@@ -222,7 +222,6 @@ def kollision_check(position, radius, wand_rechtecke):
             return True  # Kollision gefunden
     return False  # Keine Kollision
 
-
 # Funktion zur Kollisionserkennung zwischen PacMan und Geistern
 def kollision_check_pacman_geister(pacman_rect, geister, geist_durchmesser):
     # Überprüfe für jeden Geist, ob eine Kollision mit PacMan vorliegt
@@ -232,17 +231,6 @@ def kollision_check_pacman_geister(pacman_rect, geister, geist_durchmesser):
         if pacman_rect.colliderect(geist_rect):
             return True  # Kollision gefunden
     return False  # Keine Kollision
-
-'''def rotate_pacman(pacman_bild, pacman_richtung):
-    if pacman_richtung == "right":
-        return pacman_bild
-    elif pacman_richtung == "left":
-        return pygame.transform.rotate(pacman_bild, 180)
-    elif pacman_richtung == "up":
-        return pygame.transform.rotate(pacman_bild, 90)
-    elif pacman_richtung == "down":
-        return pygame.transform.rotate(pacman_bild, -90)
-    return pacman_bild'''
 
 def pacman_animiert(richtung):
     pacman_bild = pacman_offen if time.time() % 0.5 < 0.3 else pacman_geschlossen
@@ -287,6 +275,7 @@ def collect_coins(pacman_rect, coin_durchmesser, block, score):
                     layout[y][x] = ''  # Setze den Coin auf ' ' (gesammelt)
                     collected_coins += 1
                     score += 10  # Erhöhe den Score um 10 für einen Coin
+                    speichere_punkte("highscore.csv", score)  # Speichern nach jedem Coin
     return score  # Rückgabe des aktualisierten Scores
 
 def collect_berrys(pacman_rect, berry_durchmesser, block, score):
@@ -303,7 +292,20 @@ def collect_berrys(pacman_rect, berry_durchmesser, block, score):
                     layout[y][x] = ''  # Setze die Beere auf ' ' (gesammelt)
                     collected_berries += 1
                     score += 50  # Erhöhe den Score um 50 für eine Beere
+                    speichere_punkte("highscore.csv", score)# Speichern nach jeder Beere
     return score
+
+def speichere_punkte(dateiname, punkte):
+    with open(dateiname, mode='a') as datei:
+        datei.write("Punkte\n")
+        datei.write(f"{punkte}\n")
+
+def lade_highscore(dateiname):
+    with open(dateiname, mode='r') as datei:
+        lines = datei.readlines()
+        if lines:
+            #Lade den letzten Punktestand
+            return int(lines[-1].strip())  #Den letzten Wert (Punkte) lesen
 
 # Funktion zur Tunnelnutzung für PacMan
 def tunnel_pacman(pacman_pos, richtung, layout, block):
@@ -327,12 +329,11 @@ def tunnel_ghost(geist, layout, block):
 def start_menu():
     menu_font = pygame.font.Font(None, 64)
     option_font = pygame.font.Font(None, 46)
-
     #Texte
     titel_text = menu_font.render("Willkommen zu Pacman", True, farben["GELB"])
     start_text = option_font.render("Spiel Starten", True, farben["WEISS"])
     quit_text = option_font.render("Beenden", True, farben["WEISS"])
-
+    highscore_text = option_font.render("Highscore: ", True, farben["WEISS"])
     #Hintergrundbild laden und anpassen
     background_image = pygame.image.load("images/background.png")
     background_image = pygame.transform.scale(background_image, (screen.get_width(), screen.get_height()))
@@ -348,10 +349,11 @@ def start_menu():
         #Optionen mit Farbänderung
         start_text_color = farben["GELB"] if current_option == 0 else farben["WEISS"]
         quit_text_color = farben["GELB"] if current_option == 1 else farben["WEISS"]
-
+        highscore_text_color = farben["ROT"]
+        letzter_highscore = lade_highscore("highscore.csv") #Letzte Zeile der Datei
         screen.blit(option_font.render("Spiel Starten", True, start_text_color), (fenster_breite // 2 - start_text.get_width() // 2, fenster_hoehe // 2))
         screen.blit(option_font.render("Beenden", True, quit_text_color), (fenster_breite // 2 - quit_text.get_width() // 2, fenster_hoehe // 2 + 50))
-
+        screen.blit(option_font.render(f"Letzter Highscore: {letzter_highscore}", True, highscore_text_color), (fenster_breite // 2.5 - highscore_text.get_width() // 2, fenster_hoehe // 2 + 100))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -373,7 +375,6 @@ def start_menu():
 def game_over():
     game_over_text = font.render("Game Over!", True, farben["ROT"])
     screen.blit(game_over_text, (fenster_breite // 2 - game_over_text.get_width() // 2, fenster_hoehe // 2))
-
 # Funktion zum Überprüfen, ob das Spiel gewonnen wurde (alle Coins eingesammelt)
 def check_victory():
     for y, row in enumerate(layout):
@@ -410,6 +411,9 @@ if start_menu() == "start":
                     naechste_richtung = 'hoch'
                 elif event.key == pygame.K_DOWN:
                     naechste_richtung = 'runter'
+                elif event.key == pygame.K_ESCAPE:
+                    spielaktiv = False
+                    print("Spiel wurde beendet")
 
         # Spiellogik
         pacman_position, pacman_richtung = bewege_pacman(pacman_richtung, pacman_position, pacman_bewegung, wand_rechtecke, pacman_durchmesser, naechste_richtung)
@@ -437,7 +441,6 @@ if start_menu() == "start":
         if check_victory():
             victory(screen, font)
             break  # Spiel beenden, wenn gewonnen
-            # print("Du hast gewonnen!")
 
         #Spielfeld löschen (ist notwendig um Überlagerung von Grafiken zu vermeiden)
         screen.fill(farben["SCHWARZ"])
@@ -448,7 +451,6 @@ if start_menu() == "start":
 
         #Pacman anzeigen
         pacman_bild = pacman_animiert(pacman_richtung)
-        #Test pacman_bild = rotate_pacman(pacman_bild, pacman_richtung)
         screen.blit(pacman_bild, (pacman_position[0] - pacman_durchmesser // 2, pacman_position[1] - pacman_durchmesser // 2))
         #Geister anzeigen
         for geist in geister:
