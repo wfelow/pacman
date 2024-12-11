@@ -39,18 +39,6 @@ layout = [
     ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1', '1']
 ]
 
-# Fenster öffnen, Spalten und Zeilen berechnen
-#block = 30
-
-#def calculate_window_size(settings):
-    #block = settings["block"]
-    # Berechnet die Fenstergröße basierend auf der Anzahl der Spalten und Zeilen
-    #return block
-
-#fenster_breite = len(layout[0]) * block
-#fenster_hoehe = len(layout) * block
-#screen = pygame.display.set_mode((fenster_breite, fenster_hoehe))
-
 def load_images(settings):
     # Pacmanbilder
     pacman_offen = pygame.image.load('images/pacman-offen.png')
