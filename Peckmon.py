@@ -457,7 +457,7 @@ def game_over(screen, settings, fenster_breite, fenster_hoehe):
 def init_game_settings():
     """Initialisiert alle grundlegenden Spieleeinstellungen."""
     settings = {
-        "block" : 30,
+        "block" : 30,# Spielfeld ist "dynamisch anpassbar wenn Sie zb. block auf 50 ändern, müssen sie die durchmesser -1 rechnen
         "pacman_bewegung": 3,
         "pacman_durchmesser": 30,
         "geist_durchmesser": 30,
