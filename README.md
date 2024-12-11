@@ -38,4 +38,4 @@ Wenn Sie das Spiel während des Spiels beenden möchten, können Sie einfach das
   
 ## Viel Spaß beim Spielen!
 
-Ich hoffe, dass Ihnen das Spiel gefällt! Viel Spaß beim Steuern von Pac-Man und beim Sammeln der Punkte!
+Wir hoffne, dass Ihnen das Spiel gefällt! Viel Spaß beim Steuern von Pac-Man und beim Sammeln der Punkte!
